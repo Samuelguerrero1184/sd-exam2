@@ -1,0 +1,20 @@
+namespace: sd-exam2
+name: nginx-app
+
+deployment:
+  name: nginx-app
+
+service:
+  name: nginx-app
+  targetPort: 80
+  port: 80
+  type: ClusterIP
+  app: nginx
+
+image:
+  name: nginx
+  repository: "nginx"
+  tag: "latest"
+
+container:
+  port: 80

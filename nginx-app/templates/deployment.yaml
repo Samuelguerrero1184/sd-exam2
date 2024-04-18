@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Values.deployment.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.service.app }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.service.app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.service.app }}
+    spec:
+      containers:
+        - name: {{ .Values.image.name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.container.port }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 3
+        
+        - name: ubuntu
+          image: ubuntu
+          command: ["/bin/sh", "-c"]
+          args:
+            - | 
+              apt-get update && apt-get install -y curl &&
+              while true; do
+                curl http://nginx-app.sd-exam2.svc.cluster.local:80;
+                sleep 5;  # Hace la petición 
+              done
